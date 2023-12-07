@@ -11,7 +11,7 @@ use day3::day3::Day3;
 
 #[derive(Parser)]
 struct Cli {
-    day: String,
+    day: String
 }
 
 fn main() {

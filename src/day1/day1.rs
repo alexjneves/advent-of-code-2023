@@ -8,7 +8,7 @@ impl Day for Day1 {
     fn run(&self, input_type: InputType) -> i32 {
         let input = read_day_input(DAY_ID, input_type);
 
-        println!("Day 1 input: {}", input.as_str());
+        println!("Day 1 input: {:?}", input);
 
         return 0;
     }
