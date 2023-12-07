@@ -1,3 +1,3 @@
 pub trait Day {
-    fn run(&self) -> ();
+    fn run(&self) -> i32;
 }

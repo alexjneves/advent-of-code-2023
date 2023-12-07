@@ -9,20 +9,23 @@ use day1::day1::Day1;
 use day2::day2::Day2;
 use day3::day3::Day3;
 
-/// Search for a pattern in a file and display the lines that contain it.
 #[derive(Parser)]
 struct Cli {
-    /// The pattern to look for
     day: String,
 }
 
 fn main() {
     let args: Cli = Cli::parse();
 
-    match args.day.as_str() {
-        "day1" => { Day1 {}.run() }
-        "day2" => { Day2 {}.run() }
-        "day3" => { Day3 {}.run() }
-        _ => { println!("unsupported day selected") }
+    let answer: Result<i32, String> = match args.day.as_str() {
+        "day1" => Ok(Day1 {}.run()),
+        "day2" => Ok(Day2 {}.run()),
+        "day3" => Ok(Day3 {}.run()),
+        _ => Err("Invalid day provided".to_owned())
+    };
+
+    match answer {
+        Ok(answer) => println!("Result: {}", answer),
+        Err(error)=> println!("Error: {}", error.as_str()) 
     }
 }
