@@ -4,7 +4,7 @@ mod day2;
 mod day3;
 
 use clap::Parser;
-use day::{Day, Input};
+use day::{Day, InputType};
 use day1::day1::Day1;
 use day2::day2::Day2;
 use day3::day3::Day3;
@@ -17,7 +17,7 @@ struct Cli {
 fn main() {
     let args: Cli = Cli::parse();
 
-    let input = Input::Custom;
+    let input = InputType::Custom;
 
     let answer: Result<i32, String> = match args.day.as_str() {
         "day1" => Ok(Day1 {}.run(input)),
