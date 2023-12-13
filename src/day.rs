@@ -4,12 +4,6 @@ pub trait Day {
     fn run(&self, part: Part, input: InputType) -> i32;
 }
 
-// pub enum DayNum {
-//     One,
-//     Two,
-//     Three
-// }
-
 pub enum Part {
     One,
     Two
@@ -30,7 +24,7 @@ impl Display for InputType {
 }
 
 
-pub fn read_day_input(day: u8, part: Part, input_type: InputType) -> Vec<String> {
+pub fn read_day_input(day: u8, part: &Part, input_type: &InputType) -> Vec<String> {
     let path = format!(
         "src/day{}/files/part{}_{}_input.txt", 
         day, 
@@ -48,7 +42,7 @@ pub fn read_day_input(day: u8, part: Part, input_type: InputType) -> Vec<String>
     lines
 }
 
-fn part_to_int(part: Part) -> i32 {
+fn part_to_int(part: &Part) -> i32 {
     match part {
         Part::One => 1,
         Part::Two => 2,
