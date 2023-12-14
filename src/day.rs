@@ -1,4 +1,4 @@
-use std::{fs, fmt::Display};
+use std::fs;
 
 pub trait Day {
     fn run(&self, part: Part, input: InputType) -> i32;
@@ -6,40 +6,33 @@ pub trait Day {
 
 pub enum Part {
     One,
-    Two
+    Two,
 }
 
 pub enum InputType {
     Example,
-    Custom
+    Custom,
 }
-
-impl Display for InputType {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            InputType::Example => write!(f, "Example"),
-            InputType::Custom => write!(f, "Custom"),
-        }
-    }
-}
-
 
 pub fn read_day_input(day: u8, part: &Part, input_type: &InputType) -> Vec<String> {
-    let path = format!(
-        "src/day{}/files/part{}_{}_input.txt", 
-        day, 
-        part_to_int(part),
-        input_type.to_string()
-    ).to_lowercase();
+    let path = match input_type {
+        InputType::Example => format!(
+            "src/day{}/files/part{}_example_input.txt",
+            day,
+            part_to_int(part)
+        ),
+        InputType::Custom => format!(
+            "src/day{}/files/custom_input.txt",
+            day,
+        )
+    };
 
     let contents = fs::read_to_string(path).unwrap();
 
-    let lines: Vec<String> = contents
+    contents
         .split('\n')
         .map(|line| line.to_owned())
-        .collect();
-
-    lines
+        .collect()
 }
 
 fn part_to_int(part: &Part) -> i32 {
