@@ -11,11 +11,21 @@ impl Day for Day2 {
     fn run(&self, part: Part, input_type: InputType) -> i32 {
         let input = read_day_input(DAY_ID, &part, &input_type);
 
-        input.iter()
-            .map(parse_game)
-            .filter(is_game_valid)
-            .map(|game| game.id)
-            .sum()
+        match part {
+            Part::One => 
+                input.iter()
+                    .map(parse_game)
+                    .filter(is_game_valid)
+                    .map(|game| game.id)
+                    .sum(),
+
+            Part::Two => 
+                input.iter()
+                    .map(parse_game)
+                    .map(|game| get_minimum_set(&game.sets))
+                    .map(get_set_power)
+                    .sum(),
+        }
     }
 }
 
@@ -77,6 +87,28 @@ fn is_game_valid(game: &Game) -> bool {
     true
 }
 
+fn get_minimum_set(sets: &Vec<Set>) -> Set {
+    let mut red = 0;
+    let mut green = 0;
+    let mut blue = 0;
+
+    for set in sets {
+        red = std::cmp::max(red, set.red);
+        green = std::cmp::max(green, set.green);
+        blue = std::cmp::max(blue, set.blue);
+    }
+
+    Set { 
+        red, 
+        green, 
+        blue 
+    }
+}
+
+fn get_set_power(set: Set) -> i32 {
+    set.red * set.green * set.blue
+}
+
 #[derive(Debug)]
 struct Set {
     red: i32,
@@ -106,7 +138,7 @@ mod tests {
 
     #[test]
     fn day2_part1_custom_input() {
-        const EXPECTED_ANSWER: i32 = 0;
+        const EXPECTED_ANSWER: i32 = 2416;
 
         let day2 = Day2 {};
         let answer = day2.run(Part::One, InputType::Custom);
@@ -116,7 +148,7 @@ mod tests {
 
     #[test]
     fn day2_part2_example_input() {
-        const EXPECTED_ANSWER: i32 = 0;
+        const EXPECTED_ANSWER: i32 = 2286;
 
         let day2 = Day2 {};
         let answer = day2.run(Part::Two, InputType::Example);
@@ -126,7 +158,7 @@ mod tests {
 
     #[test]
     fn day2_part2_custom_input() {
-        const EXPECTED_ANSWER: i32 = 0;
+        const EXPECTED_ANSWER: i32 = 63307;
 
         let day2 = Day2 {};
         let answer = day2.run(Part::Two, InputType::Custom);
