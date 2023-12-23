@@ -43,26 +43,20 @@ fn get_engine_parts(lines: &Vec<String>) -> Vec<i32> {
 
                 end_index = char_index;
                 part.push(digit);
-            } else {
-                // found a non-digit character
+            } 
 
-                if processing_number {
-                    // end of number
+            // found a non-digit character or we've reached the end of the line
+            // if we were processing a number then evaluate it
+            if (digit.is_none() || char_index == char_line.len() - 1) && processing_number {
+                let is_engine_part = is_range_adjacent_to_symbol(&char_lines, line_index, start_index..end_index + 1);
 
-                    let is_engine_part = is_range_adjacent_to_symbol(&char_lines, line_index, start_index..end_index + 1);
-
-                    if is_engine_part {
-                        let part_value = digits_to_number(&part);
-                        parts.push(part_value);
-                    }
-
-                    // is any index adjacent to a symbol?
-                    // if yes, convert digits to number, add to parts
-                    // if no, no-op
-
-                    processing_number = false;
-                    part.clear();
+                if is_engine_part {
+                    let part_value = digits_to_number(&part);
+                    parts.push(part_value);
                 }
+
+                processing_number = false;
+                part.clear();
             }
         }
     }
@@ -145,7 +139,7 @@ mod tests {
 
     #[test]
     fn day3_part1_custom_input() {
-        const EXPECTED_ANSWER: i32 = 0;
+        const EXPECTED_ANSWER: i32 = 540025;
 
         let day3 = Day3 {};
         let answer = day3.run(Part::One, InputType::Custom);
