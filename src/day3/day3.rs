@@ -1,4 +1,4 @@
-use std::ops::Range;
+use std::{ops::Range, collections::HashMap};
 
 use crate::day::{Day, InputType, Part, read_day_input};
 
@@ -12,18 +12,45 @@ impl Day for Day3 {
 
         let ep = get_engine_parts(&input);
 
-        ep
+        if matches!(part, Part::One) {
+            return ep
+                .iter()
+                .map(|part| part.number)
+                .sum();
+        }
+
+        let potential_gears = ep
             .iter()
+            .filter(|part| part.symbol == '*');
+
+        let mut gears: HashMap<(usize, usize), Vec<i32>> = HashMap::new();
+
+        for potential_gear in potential_gears {
+            let gear_values = gears.entry(potential_gear.symbol_coords).or_default();
+
+            gear_values.push(potential_gear.number);
+        }
+
+        gears
+            .iter()
+            .filter(|gear| gear.1.len() == 2)
+            .map(|gear| gear.1[0] * gear.1[1])
             .sum()
     }
 }
 
-fn get_engine_parts(lines: &Vec<String>) -> Vec<i32> {
+struct EnginePart {
+    number: i32,
+    symbol: char,
+    symbol_coords: (usize, usize)
+}
+
+fn get_engine_parts(lines: &Vec<String>) -> Vec<EnginePart> {
     let char_lines = lines.iter()
         .map(|line| line.chars().collect::<Vec<char>>())
         .collect::<Vec<Vec<char>>>();
 
-    let mut parts: Vec<i32> = vec![];
+    let mut parts: Vec<EnginePart> = vec![];
 
     for (line_index, char_line) in char_lines.iter().enumerate() {
         let mut processing_number = false;
@@ -48,11 +75,15 @@ fn get_engine_parts(lines: &Vec<String>) -> Vec<i32> {
             // found a non-digit character or we've reached the end of the line
             // if we were processing a number then evaluate it
             if (digit.is_none() || char_index == char_line.len() - 1) && processing_number {
-                let is_engine_part = is_range_adjacent_to_symbol(&char_lines, line_index, start_index..end_index + 1);
+                let adjacent_symbol = get_adjacent_symbol(&char_lines, line_index, start_index..end_index + 1);
 
-                if is_engine_part {
+                if let Some((symbol, coords)) = adjacent_symbol {
                     let part_value = digits_to_number(&part);
-                    parts.push(part_value);
+
+                    parts.push(EnginePart { 
+                        number: part_value, 
+                        symbol, symbol_coords: 
+                        coords  });
                 }
 
                 processing_number = false;
@@ -64,25 +95,21 @@ fn get_engine_parts(lines: &Vec<String>) -> Vec<i32> {
     parts
 }
 
-fn is_range_adjacent_to_symbol(engine: &Vec<Vec<char>>, line_number: usize, range: Range<usize>) -> bool {
+fn get_adjacent_symbol(engine: &Vec<Vec<char>>, line_number: usize, range: Range<usize>) -> Option<(char, (usize, usize))> {
     for cell in range {
         let adjacent_cells = get_adjacent_cells(line_number.try_into().unwrap(), cell);
 
         for (row, col) in adjacent_cells {
-            if let Some(cell_is_symbol) = engine.get(row)
+            if let Some(symbol) = engine.get(row)
                     .and_then(|row_values| row_values.get(col))
-                    .and_then(|cell_value| Some(is_symbol(cell_value)))
+                    .and_then(|cell_value| if is_symbol(cell_value) { Some(cell_value.clone()) } else { None })
             {
-                if cell_is_symbol {
-                    return true;
-                }
+                return Some((symbol, (row, col)));
             }
-
         }
-
     }
 
-    false
+    None
 }
 
 fn get_adjacent_cells(row: usize, col: usize) -> Vec<(usize, usize)> {
@@ -151,7 +178,7 @@ mod tests {
 
     #[test]
     fn day3_part2_example_input() {
-        const EXPECTED_ANSWER: i32 = 0;
+        const EXPECTED_ANSWER: i32 = 467835;
 
         let day3 = Day3 {};
         let answer = day3.run(Part::Two, InputType::Example);
@@ -161,7 +188,7 @@ mod tests {
 
     #[test]
     fn day3_part2_custom_input() {
-        const EXPECTED_ANSWER: i32 = 0;
+        const EXPECTED_ANSWER: i32 = 84584891;
 
         let day3 = Day3 {};
         let answer = day3.run(Part::Two, InputType::Custom);
